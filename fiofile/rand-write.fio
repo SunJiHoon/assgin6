@@ -1,0 +1,14 @@
+; --start job file --
+[global]
+name=JiHoonSun20192051
+directory=/mnt/test
+rw=write
+bs=4K
+direct=0
+numjobs=1
+verify=meta
+
+[fio-test]
+size=6144M
+group_reporting
+; --end job file --

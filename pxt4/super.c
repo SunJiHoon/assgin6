@@ -6334,6 +6334,7 @@ out7:
 	return err;
 }
 
+extern unsigned long long file_write_iter_time, file_write_iter_count;
 static void __exit pxt4_exit_fs(void)
 {
 	pxt4_destroy_lazyinit_thread();
@@ -6348,6 +6349,8 @@ static void __exit pxt4_exit_fs(void)
 	pxt4_exit_post_read_processing();
 	pxt4_exit_es();
 	pxt4_exit_pending();
+	
+	printk("pxt4_file_write_iter is called %llu times and the time interval is %lluns\n", file_write_iter_time, file_write_iter_count);
 }
 
 MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
