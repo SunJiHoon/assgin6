@@ -5,10 +5,16 @@ directory=/mnt/test
 rw=write
 bs=4K
 direct=0
-numjobs=1
+numjobs=4
 verify=meta
 
+;my memory = 1024M
+;my memory * 3 = 3072M
+;3072M/4 == 768M
+; so i use 768M
 [fio-test]
-size=6144M
+
+;size=768M
+size=32M
 group_reporting
 ; --end job file --

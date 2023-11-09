@@ -34,7 +34,7 @@
 #include "xattr.h"
 #include "acl.h"
 #include "calclock.h"
-
+#include "my_xarray.h"
 #ifdef CONFIG_FS_DAX
 static ssize_t pxt4_dax_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
@@ -289,18 +289,34 @@ out:
 }
 
 //###############################################################################################################################
+unsigned long long test7;
+struct my_xarray myarr;//linux assign 8
 unsigned long long file_write_iter_time, file_write_iter_count;
 
 static ssize_t pxt4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 {
     ssize_t ret;
     struct timespec myclock[2];
-
+    
+    int num = retrieve_data(&myarr, get_current()->cpu);
+    if (num  == -1){
+	insert_data(&myarr, get_current()->cpu, 1);
+    }
+    else {
+    	insert_data(&myarr, get_current()->cpu, num + 1);
+    }
     getrawmonotonic(&myclock[0]);
     ret = pxt4_file_write_iter_internal(iocb, from);
     getrawmonotonic(&myclock[1]);
     calclock(myclock, &file_write_iter_time, &file_write_iter_count);
-
+    if (get_current()->cpu == 0){
+    	test7 += 1;
+    }
+    printk("cpu[%d] called pxt4_file_write_iter()", get_current()->cpu);
+    printk("cpu[%d] was called [%d] times", get_current()->cpu, num + 1);
+    globalPlus1(&test7);
+    printk("file_write_iter_time: %llu", file_write_iter_time);
+    printk("test7 : %llu ",test7);
     return ret;
 }
 
