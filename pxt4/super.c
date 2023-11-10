@@ -61,6 +61,7 @@
 #include "my_xarray.h"
 #include <linux/xarray.h>
 #include "ds_monitoring.h"
+#include "calclock.h"
 static struct pxt4_lazy_init *pxt4_li_info;
 static struct mutex pxt4_li_mtx;
 static struct ratelimit_state pxt4_mount_msg_ratelimit;
@@ -6339,8 +6340,8 @@ out7:
 
 
 DECLARE_DS_MONITORING(ds_global);
-//extern struct ds_monitoring ds_global;
-extern unsigned long long file_write_iter_time, file_write_iter_count;
+//extern unsigned long long file_write_iter_time, file_write_iter_count;
+KTDEC(pxt4_file_write_iter);
 static void __exit pxt4_exit_fs(void)
 {
 	struct item *myitem;
@@ -6357,12 +6358,10 @@ static void __exit pxt4_exit_fs(void)
 	pxt4_exit_post_read_processing();
 	pxt4_exit_es();
 	pxt4_exit_pending();
-	printk("pxt4_file_write_iter is called %llu times and the time interval is %lluns\n", file_write_iter_time, file_write_iter_count);
-	printk("plz say value");
-	printk("end");
+	//printk("pxt4_file_write_iter is called %llu times and the time interval is %lluns\n", file_write_iter_time, file_write_iter_count);
+	ktprint(1, pxt4_file_write_iter);
 	print_ds_monitoring(&ds_global);
-	
-	printk("end");	
+	delete_ds_monitoring(&ds_global);
 }
 
 MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");

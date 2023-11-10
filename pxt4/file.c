@@ -293,22 +293,24 @@ out:
 //###############################################################################################################################
 
 DEFINE_DS_MONITORING(ds_global, get_thread_idx, get_thread_name, print_zone_dm);
-//DEFINE_XARRAY(global_xarr);
-//DEFINE_DS_MONITORING_OPS(global_xarr, get_thread_idx, get_thread_name, print_zone_dm);
-//struct ds_monitoring dsMonitor = DS_MONITORING_INIT(global_xarr, global_xarr_dm_ops);
 unsigned long long file_write_iter_time, file_write_iter_count;
 
+KTDEF(pxt4_file_write_iter);
 static ssize_t pxt4_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 {
     ssize_t ret;
-    struct timespec myclock[2];
+    //struct timespec myclock[2];
+    ktime_t stopwatch[2];
 
-    getrawmonotonic(&myclock[0]);
+    //getrawmonotonic(&myclock[0]);
+    ktget(&stopwatch[0]);
     ret = pxt4_file_write_iter_internal(iocb, from);
-    getrawmonotonic(&myclock[1]);
-    calclock(myclock, &file_write_iter_time, &file_write_iter_count);
+    //getrawmonotonic(&myclock[1]);
+    ktget(&stopwatch[1]);
+    //calclock(myclock, &file_write_iter_time, &file_write_iter_count);
+    ktput(stopwatch, pxt4_file_write_iter);
     printk("cpu[%d] called pxt4_file_write_iter()", get_current()->cpu);
-    printk("file_write_iter_time: %llu", file_write_iter_time);
+    //printk("file_write_iter_time: %llu", file_write_iter_time);
 
     struct ds_monitoring_elem *elem;
     elem = kmalloc(sizeof(*elem), GFP_KERNEL);
