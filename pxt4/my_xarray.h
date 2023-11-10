@@ -7,6 +7,11 @@ struct my_xarray {
     struct xarray xarr;
 };
 
+struct item {
+	unsigned long index;
+	unsigned int order;
+};
+
 unsigned long long globalPlus1(unsigned long long *total_count);
 void initialize_xarray(struct my_xarray *my_xarr);
 void insert_data(struct my_xarray *my_xarr, int key, int value);

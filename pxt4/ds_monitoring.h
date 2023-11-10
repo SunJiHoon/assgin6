@@ -47,9 +47,8 @@ struct ds_monitoring_elem {
 		.dm_ops = &_dm_ops, \
 }
 
-#define DECLARE_DS_MONITORING (name) \
+#define DECLARE_DS_MONITORING(name) \
 	extern struct ds_monitoring name;
-
 
 // 함수 선언
 void find_ds_monitoring(struct ds_monitoring *dm, void *elem);
@@ -60,9 +59,7 @@ void delete_ds_monitoring(struct ds_monitoring *dm);
 // 추가 함수 선언
 unsigned long get_thread_idx(void *elem);
 const char *get_thread_name(void *elem);
-
 void print_zone_dm(unsigned long pid, const char *name, unsigned long long count, int percentage);
 
 //static long wb_check_background_flush(struct bdi_writeback *wb);
 #endif
-

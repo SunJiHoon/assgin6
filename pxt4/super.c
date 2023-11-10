@@ -59,7 +59,8 @@
 #include <trace/events/pxt4.h>
 
 #include "my_xarray.h"
-
+#include <linux/xarray.h>
+#include "ds_monitoring.h"
 static struct pxt4_lazy_init *pxt4_li_info;
 static struct mutex pxt4_li_mtx;
 static struct ratelimit_state pxt4_mount_msg_ratelimit;
@@ -6337,12 +6338,13 @@ out7:
 }
 
 
-extern int test7;
-extern struct my_xarray myarr;
+DECLARE_DS_MONITORING(ds_global);
+//extern struct ds_monitoring ds_global;
 extern unsigned long long file_write_iter_time, file_write_iter_count;
 static void __exit pxt4_exit_fs(void)
 {
-	//struct my_xarray myarr;
+	struct item *myitem;
+	struct ds_monitoring_elem *elem;
 	pxt4_destroy_lazyinit_thread();
 	unregister_as_pxt2();
 	unregister_as_ext3();
@@ -6355,17 +6357,11 @@ static void __exit pxt4_exit_fs(void)
 	pxt4_exit_post_read_processing();
 	pxt4_exit_es();
 	pxt4_exit_pending();
-	test7 =1 ;
-	printk("test7 value : %d", test7);	
 	printk("pxt4_file_write_iter is called %llu times and the time interval is %lluns\n", file_write_iter_time, file_write_iter_count);
-	
 	printk("plz say value");
-	initialize_xarray(&myarr);
-	insert_data(&myarr, 1, 10);
-	insert_data(&myarr, 2, 20);
-	printk("%d", retrieve_data(&myarr, 2));
-	printk("%d", retrieve_data(&myarr, 1));
 	printk("end");
+	print_ds_monitoring(&ds_global);
+	
 	printk("end");	
 }
 

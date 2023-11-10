@@ -26,6 +26,8 @@ insert_ds_monitoring(struct ds_monitoring *dm, unsigned long index, void *elem)
 	GFP_KERNEL);
 	new->key = index;
 	new->count = 1;
+	/*
+	 * 
 	if (dm->dm_ops->get_name) {
 		name = dm->dm_ops->get_name(elem);
 		new->name = kmalloc(strlen(name)+1, GFP_KERNEL);
@@ -33,6 +35,7 @@ insert_ds_monitoring(struct ds_monitoring *dm, unsigned long index, void *elem)
 	} else {
 	new->name = NULL;
 	}
+	*/
 	xa_store(dm->elements, new->key, (void*) new, GFP_KERNEL);
 }
 
@@ -66,28 +69,29 @@ void delete_ds_monitoring(struct ds_monitoring *dm)
 	xa_destroy(dm->elements);
 }
 
-static unsigned long get_thread_idx(void *elem)
+unsigned long get_thread_idx(void *elem)
 {
-int node_idx;
-unsigned long xa_index;
-int zone_idx;
-struct task_struct *current_task = (struct task_struct *) elem;
-return (unsigned long) current_task->pid;
+	int node_idx;
+	unsigned long xa_index;
+	int zone_idx;
+
+	struct ds_monitoring_elem *current_task = (struct ds_monitoring_elem *) elem;
+	return (unsigned long) current_task->key;
 }
 
-static const char * get_thread_name(void *elem)
+const char * get_thread_name(void *elem)	
 {
-struct task_struct *current_task = (struct task_struct *) elem;
-return current_task->comm;
+	struct ds_monitoring_elem *current_task = (struct ds_monitoring_elem *) elem;
+	return current_task->name;
 }
 
-static void print_zone_dm(unsigned long pid,
+void print_zone_dm(unsigned long pid,
 const char *name,
 unsigned long long count,
 int percentage)
 {
-printk("thread %s: pid %ld called wb_check_background_flush() \
-%lld times (%d%%)\n", name, pid, count, percentage);
+	printk("cpu[%ld] called pxt4_file_write_iter() \
+	%lld times (%d%%)\n", pid, count, percentage);
 }
 
 DEFINE_DS_MONITORING(thread_dm, get_thread_idx, get_thread_name, print_zone_dm);
